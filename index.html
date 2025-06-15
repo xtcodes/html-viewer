@@ -4,118 +4,112 @@
   <meta charset="UTF-8">
   <title>HTML Source Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Highlight.js Theme -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css">
+  <!-- Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
   <style>
     body {
       margin: 0;
+      background: #1e1e1e;
+      color: #f8f8f2;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #1e1e1e;
-      color: #fff;
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
 
     header {
-      background-color: #111;
+      background-color: #282a36;
       padding: 1rem;
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       font-weight: bold;
-      border-bottom: 1px solid #444;
+      color: #f8f8f2;
     }
 
     .controls {
-      padding: 1rem;
       display: flex;
-      gap: 1rem;
       flex-wrap: wrap;
-      background: #222;
+      padding: 1rem;
+      background-color: #21222c;
+      gap: 0.5rem;
       justify-content: center;
     }
 
     input[type="url"] {
-      flex: 1;
-      padding: 0.7rem;
-      border: none;
-      border-radius: 4px;
+      flex: 1 1 60%;
+      padding: 0.6rem;
       font-size: 1rem;
-      width: 60%;
+      border-radius: 4px;
+      border: none;
     }
 
     button {
-      padding: 0.7rem 1rem;
-      border: none;
-      background-color: #007acc;
+      padding: 0.6rem 1rem;
+      background-color: #6272a4;
       color: white;
+      border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 1rem;
     }
 
     button:hover {
-      background-color: #005f99;
+      background-color: #7082c4;
     }
 
     pre {
-      flex: 1;
       margin: 0;
       padding: 1rem;
       overflow: auto;
       background-color: #1e1e1e;
-      color: #ccc;
+      flex: 1;
     }
 
     code {
-      font-size: 0.9rem;
+      font-size: 14px;
       line-height: 1.5;
     }
 
     .output {
       flex: 1;
-      overflow: auto;
-      background: #1e1e1e;
-    }
-
-    @media (max-width: 768px) {
-      input[type="url"] {
-        width: 100%;
-      }
     }
   </style>
 </head>
 <body>
   <header>HTML Source Viewer</header>
-
   <div class="controls">
-    <input type="url" id="urlInput" placeholder="Masukkan URL halaman web (mis. https://example.com)">
-    <button onclick="loadSource()">Lihat Source</button>
+    <input type="url" id="urlInput" placeholder="https://example.com">
+    <button onclick="getSource()">Lihat Source</button>
   </div>
-
   <div class="output">
-    <pre><code id="codeBlock" class="html">Masukkan URL dan tekan tombol di atas...</code></pre>
+    <pre><code id="sourceCode" class="html">Masukkan URL dan tekan tombol "Lihat Source"</code></pre>
   </div>
 
   <!-- Highlight.js -->
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
   <script>
-    hljs.registerLanguage('html', window.hljs.getLanguage('xml'));
     hljs.highlightAll();
 
-    async function loadSource() {
-      const url = document.getElementById('urlInput').value;
-      const codeBlock = document.getElementById('codeBlock');
-      codeBlock.textContent = 'Mengambil source...';
+    async function getSource() {
+      const input = document.getElementById("urlInput");
+      const codeBlock = document.getElementById("sourceCode");
+      const url = input.value.trim();
+
+      if (!url.startsWith('http')) {
+        codeBlock.textContent = 'URL harus dimulai dengan http:// atau https://';
+        return;
+      }
+
+      codeBlock.textContent = "Mengambil source dari:\n" + url + "\n\nMohon tunggu...";
 
       try {
-        const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url));
+        const response = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url));
+        if (!response.ok) throw new Error("Gagal mengambil source.");
         const data = await response.json();
         codeBlock.textContent = data.contents;
         hljs.highlightElement(codeBlock);
       } catch (err) {
-        codeBlock.textContent = 'Gagal mengambil source. Pastikan URL valid dan situs mengizinkan akses publik.\n\n' + err;
+        codeBlock.textContent = "Gagal mengambil source:\n" + err.message;
       }
     }
   </script>
