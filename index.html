@@ -2,76 +2,66 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>HTML Viewer Online</title>
+  <title>HTML Source Viewer</title>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    h1 {
-      margin: 0;
-      padding: 1rem;
-      background: #333;
-      color: #fff;
-      text-align: center;
-    }
-
-    .editor {
-      flex: 1;
-      display: flex;
-    }
-
-    textarea {
-      width: 50%;
-      padding: 1rem;
       font-family: monospace;
-      font-size: 1rem;
-      border: none;
-      resize: none;
-      outline: none;
+      background: #1e1e1e;
+      color: #f8f8f2;
+      padding: 20px;
     }
-
-    iframe {
-      width: 50%;
+    textarea {
+      width: 100%;
+      height: 80vh;
+      background: #272822;
+      color: #f8f8f2;
       border: none;
+      padding: 10px;
+      font-size: 14px;
+      white-space: pre;
+      overflow: auto;
     }
-
-    @media (max-width: 768px) {
-      .editor {
-        flex-direction: column;
-      }
-
-      textarea,
-      iframe {
-        width: 100%;
-        height: 50%;
-      }
+    input[type="url"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      margin-left: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>HTML Viewer Online</h1>
-  <div class="editor">
-    <textarea id="htmlInput" placeholder="Tulis HTML di sini..."></textarea>
-    <iframe id="preview"></iframe>
-  </div>
+  <h2>HTML Source Viewer</h2>
+  <p>Masukkan URL (gunakan proxy/server Anda untuk akses lintas domain):</p>
+  <form onsubmit="fetchSource(); return false;">
+    <input type="url" id="urlInput" placeholder="https://example.com" required>
+    <button type="submit">Lihat Source</button>
+  </form>
+  <br>
+  <textarea id="sourceOutput" placeholder="HTML akan ditampilkan di sini..."></textarea>
 
   <script>
-    const textarea = document.getElementById('htmlInput');
-    const preview = document.getElementById('preview');
+    function fetchSource() {
+      const url = document.getElementById('urlInput').value;
+      const output = document.getElementById('sourceOutput');
+      
+      // Gunakan proxy publik (untuk demo; gunakan server sendiri untuk produksi)
+      const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
 
-    textarea.addEventListener('input', () => {
-      const html = textarea.value;
-      preview.srcdoc = html;
-    });
+      output.value = 'Memuat source...';
 
-    // Inisialisasi dengan template dasar
-    textarea.value = "<h2>Selamat datang di HTML Viewer</h2>\n<p>Edit HTML ini untuk melihat preview langsung.</p>";
-    preview.srcdoc = textarea.value;
+      fetch(proxyUrl)
+        .then(response => response.json())
+        .then(data => {
+          output.value = data.contents;
+        })
+        .catch(error => {
+          output.value = 'Gagal mengambil source.\n\n' + error;
+        });
+    }
   </script>
 </body>
 </html>
