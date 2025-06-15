@@ -23,7 +23,6 @@
       text-align: center;
       font-size: 1.2rem;
       font-weight: bold;
-      color: #f8f8f2;
     }
 
     .controls {
@@ -88,6 +87,7 @@
       cursor: pointer;
       z-index: 10;
       opacity: 0.8;
+      display: none; /* <== Tombol disembunyikan awalnya */
     }
 
     .copy-btn:hover {
@@ -116,7 +116,7 @@
     <button onclick="getSource()">Lihat Source</button>
   </div>
   <div class="output">
-    <button class="copy-btn" onclick="copyCode()">Salin Kode</button>
+    <button id="copyBtn" class="copy-btn" onclick="copyCode()">Salin Kode</button>
     <pre><code id="sourceCode" class="html">Masukkan URL dan tekan tombol "Lihat Source"</code></pre>
   </div>
 
@@ -129,7 +129,11 @@
     async function getSource() {
       const input = document.getElementById("urlInput");
       const codeBlock = document.getElementById("sourceCode");
+      const copyBtn = document.getElementById("copyBtn");
       const url = input.value.trim();
+
+      // Sembunyikan tombol salin sebelum mencoba ambil source
+      copyBtn.style.display = "none";
 
       if (!url.startsWith('http')) {
         codeBlock.textContent = 'URL harus dimulai dengan http:// atau https://';
@@ -144,8 +148,12 @@
         const data = await response.json();
         codeBlock.textContent = data.contents;
         hljs.highlightElement(codeBlock);
+
+        // Tampilkan tombol salin setelah berhasil
+        copyBtn.style.display = "block";
       } catch (err) {
         codeBlock.textContent = "Gagal mengambil source:\n" + err.message;
+        copyBtn.style.display = "none";
       }
     }
 
@@ -154,7 +162,7 @@
       const text = codeBlock.innerText;
 
       navigator.clipboard.writeText(text).then(() => {
-        const btn = document.querySelector(".copy-btn");
+        const btn = document.getElementById("copyBtn");
         btn.textContent = "Tersalin!";
         setTimeout(() => (btn.textContent = "Salin Kode"), 2000);
       }).catch(() => {
