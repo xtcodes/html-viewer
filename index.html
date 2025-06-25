@@ -17,6 +17,12 @@
       height: 100vh;
     }
 
+    main {
+        width: 600px;
+        margin: 5em auto;
+        padding: 2em;
+    }
+    
     header {
       background-color: #282a36;
       padding: 1rem;
@@ -107,9 +113,17 @@
         font-size: 0.8rem;
       }
     }
+
+    @media (max-width: 700px) {
+        main {
+            margin: 0 auto;
+            width: auto;
+        }
+    }
   </style>
 </head>
 <body>
+  <main>
   <header>HTML Source Viewer</header>
   <div class="controls">
     <input type="url" id="urlInput" placeholder="https://example.com">
@@ -119,7 +133,8 @@
     <button id="copyBtn" class="copy-btn" onclick="copyCode()">Salin Kode</button>
     <pre><code id="sourceCode" class="html">Masukkan URL dan tekan tombol "Lihat Source"</code></pre>
   </div>
-
+  </main>
+  
   <!-- Highlight.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
